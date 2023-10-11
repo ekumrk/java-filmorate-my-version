@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Slf4j
 public abstract class ControllerEntity<T extends ModelEntity> {
     private final Map<Integer, T> storage = new HashMap<>();
@@ -27,7 +28,7 @@ public abstract class ControllerEntity<T extends ModelEntity> {
     }
 
     public T update(T data) {
-        if(!(storage.containsKey(data.getId()))) {
+        if (!(storage.containsKey(data.getId()))) {
             throw new DataNotFoundException(String.format("Объект %s таким %s отсутствует в хранилище.", data,
                     data.getId()));
         }
