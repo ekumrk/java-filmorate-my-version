@@ -40,7 +40,7 @@ class FilmControllerTest {
         Film film = Film.builder()
                 .name("Harry Potter")
                 .description("Best film")
-                .releaseDate(LocalDate.of(2020, 03, 12))
+                .releaseDate(LocalDate.of(2020, 3, 12))
                 .duration(120)
                 .build();
         f.createFilm(film);
@@ -52,7 +52,7 @@ class FilmControllerTest {
         Film film = Film.builder()
                 .name("")
                 .description("Best film")
-                .releaseDate(LocalDate.of(2020, 03, 12))
+                .releaseDate(LocalDate.of(2020, 3, 12))
                 .duration(120)
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
@@ -65,7 +65,7 @@ class FilmControllerTest {
                 .description("Good film aaaaaaaaaaaaagofgjiodenfjklgoiebnowseofhihboiwehrouvbjklsebdnouifbvqoebroivboi" +
                         "njksefkbjvjiebrviuqbejkrbvjksbdkjbvukbwerkbuvuiwheuirgvquiehriuohqweefoiqwerouhfqiowernbofqw" +
                         "qwerfjoqberobvquiewbruifbquiwoebfuibquiewbruiqbeuwivbiuqbwuiebvuiqberwuivbquiwbeuivbquibqiuweb")
-                .releaseDate(LocalDate.of(2020,03,03))
+                .releaseDate(LocalDate.of(2020,3,03))
                 .duration(120)
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
@@ -76,7 +76,7 @@ class FilmControllerTest {
         Film film = Film.builder()
                 .name("Harry Potter")
                 .description("Best film")
-                .releaseDate(LocalDate.of(1800, 03, 12))
+                .releaseDate(LocalDate.of(1800, 3, 12))
                 .duration(120)
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
@@ -87,7 +87,7 @@ class FilmControllerTest {
         Film film = Film.builder()
                 .name("Harry Potter")
                 .description("Best film")
-                .releaseDate(LocalDate.of(1999, 03, 12))
+                .releaseDate(LocalDate.of(1999, 3, 12))
                 .duration(-120)
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> f.validate(film));

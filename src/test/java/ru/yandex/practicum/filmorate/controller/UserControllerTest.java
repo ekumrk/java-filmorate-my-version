@@ -40,7 +40,7 @@ class UserControllerTest {
                 .email("test@yandex.ru")
                 .login("testlogin")
                 .name("vasya testov")
-                .birthday(LocalDate.of(2000, 05, 06))
+                .birthday(LocalDate.of(2000, 5, 6))
                 .build();
         u.addUser(user);
         Assertions.assertFalse(u.getUsers().isEmpty());
@@ -52,7 +52,7 @@ class UserControllerTest {
                 .email("")
                 .login("testlogin")
                 .name("vasya testov")
-                .birthday(LocalDate.of(2000, 05, 06))
+                .birthday(LocalDate.of(2000, 5, 6))
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
     }
@@ -63,7 +63,7 @@ class UserControllerTest {
                 .email("test-yandex.ru")
                 .login("testlogin")
                 .name("vasya testov")
-                .birthday(LocalDate.of(2000, 05, 06))
+                .birthday(LocalDate.of(2000, 5, 6))
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
     }
@@ -74,7 +74,7 @@ class UserControllerTest {
                 .email("test@yandex.ru")
                 .login("")
                 .name("vasya testov")
-                .birthday(LocalDate.of(2000, 05, 06))
+                .birthday(LocalDate.of(2000, 5, 6))
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
     }
@@ -85,7 +85,7 @@ class UserControllerTest {
                 .email("test@yandex.ru")
                 .login("vasya petrov")
                 .name("vasya testov")
-                .birthday(LocalDate.of(2000, 05, 06))
+                .birthday(LocalDate.of(2000, 5, 6))
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
     }
@@ -96,7 +96,7 @@ class UserControllerTest {
                 .email("test@yandex.ru")
                 .login("testlogin")
                 .name("vasya testov")
-                .birthday(LocalDate.of(2030, 05, 06))
+                .birthday(LocalDate.of(2030, 5, 6))
                 .build();
         Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
     }

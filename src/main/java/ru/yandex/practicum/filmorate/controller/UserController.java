@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.controller.exceptions.ValidationException;
@@ -11,41 +10,27 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/users")
-@Slf4j
-public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
-    private int currentId = 1;
+public class UserController extends ControllerEntity<User> {
 
     @GetMapping
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
+        return super.getStorage();
     }
 
     @PostMapping
     public User addUser(@RequestBody User user) {
-        validate(user);
-
-        if (user.name == null || user.name.isBlank()) {
-            user.name = user.getLogin();
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
         }
-        user.setId(currentId);
-        users.put(currentId, user);
-        log.debug("Пользователь успешно добавлен. '{}'", user);
-        currentId++;
-        return user;
+        return super.create(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.debug("Пользователь успешно обновлён. '{}'", user);
-            return user;
-        } else {
-            throw new ValidationException("Нет пользователя с таким id");
-        }
+       return super.update(user);
     }
 
+    @Override
     public void validate(User user) throws NullPointerException {
         if (user.getEmail().isBlank() || user.getEmail().isEmpty()) {
             throw new ValidationException("E-mail адрес не может быть пустым.");
