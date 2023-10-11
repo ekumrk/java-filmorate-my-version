@@ -47,7 +47,7 @@ public class UserController {
     }
 
     public void validate(User user) throws NullPointerException {
-        if (user.getEmail().isBlank() || user.getEmail().isEmpty()){
+        if (user.getEmail().isBlank() || user.getEmail().isEmpty()) {
             throw new ValidationException("E-mail адрес не может быть пустым.");
         } else if (!(user.getEmail().contains("@"))) {
             throw new ValidationException(("E-mail адрес должен содержать символ @"));
