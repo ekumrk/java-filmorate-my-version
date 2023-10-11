@@ -50,7 +50,7 @@ public class UserController {
         if (user.getEmail().isBlank() || user.getEmail().isEmpty()) {
             throw new ValidationException("E-mail адрес не может быть пустым.");
         } else if (!(user.getEmail().contains("@"))) {
-            throw new ValidationException(("E-mail адрес должен содержать символ @"));
+            throw new ValidationException("E-mail адрес должен содержать символ @");
         } else if (user.getLogin().isBlank()) {
             throw new ValidationException("Логин не может быть пустым");
         } else if (StringUtils.containsWhitespace(user.getLogin())) {
