@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.controller.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,12 +19,8 @@ public class FilmController {
     private int currentId = 1;
 
     @GetMapping
-    public List<Film> getUsers() {
-        List<Film> filmList = new ArrayList<>();
-        for (Film f: films.values()) {
-            filmList.add(f);
-        }
-        return filmList;
+    public List<Film> getFilms() {
+        return new ArrayList<>(films.values());
     }
 
     @PostMapping
@@ -50,7 +45,7 @@ public class FilmController {
         }
     }
 
-    private void validate(Film film) throws NullPointerException {
+    public void validate(Film film) throws NullPointerException {
        if (film.getName().isBlank()) {
            throw new ValidationException("Название фильма не может быть пустым.");
        } else if (film.getDescription().length() > 200) {
@@ -59,8 +54,6 @@ public class FilmController {
            throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года");
        } else if (film.getDuration() <= 0) {
            throw new ValidationException("Продолжительность фильма должна быть положительной.");
-       } else if (film.equals(null)) {
-           throw new ValidationException("Не все поля были заполнены при оформлении фильма.");
        }
     }
 }

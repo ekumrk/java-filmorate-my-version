@@ -18,13 +18,8 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
-        List<User> userList = new ArrayList<>();
-        for (User u: users.values()) {
-            userList.add(u);
-        }
-        return userList;
+        return new ArrayList<>(users.values());
     }
-    //Согласен, что можно вернуть мапу и всё, но так тесты в постмане не пропускают(
 
     @PostMapping
     public User addUser(@RequestBody User user) {
@@ -51,7 +46,7 @@ public class UserController {
         }
     }
 
-    private void validate(User user) throws NullPointerException {
+    public void validate(User user) throws NullPointerException {
         if (user.getEmail().isBlank() || user.getEmail().isEmpty()){
             throw new ValidationException("E-mail адрес не может быть пустым.");
         } else if (!(user.getEmail().contains("@"))) {
