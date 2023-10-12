@@ -29,8 +29,7 @@ public abstract class ControllerEntity<T extends ModelEntity> {
 
     public T update(T data) {
         if (!(storage.containsKey(data.getId()))) {
-            throw new DataNotFoundException(String.format("Объект %s таким %s отсутствует в хранилище.", data,
-                    data.getId()));
+            throw new DataNotFoundException(String.format("Объект с id %s отсутствует в хранилище.", data.getId()));
         }
         storage.put(data.getId(), data);
         log.debug(String.format("Объект %s успешно обновлён.", data));
