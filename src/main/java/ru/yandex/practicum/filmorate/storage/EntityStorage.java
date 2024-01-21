@@ -1,17 +1,16 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.controller.exceptions.DataNotFoundException;
+import ru.yandex.practicum.filmorate.storage.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.ModelEntity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public abstract class ControllerEntity<T extends ModelEntity> {
-    private final Map<Integer, T> storage = new HashMap<>();
+public abstract class EntityStorage<T extends ModelEntity> {
+    protected Map<Integer, T> storage;
     private int currentId = 1;
 
     public List<T> getStorage() {

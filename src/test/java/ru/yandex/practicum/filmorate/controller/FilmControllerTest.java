@@ -1,115 +1,85 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.ResourceUtils;
-import ru.yandex.practicum.filmorate.controller.exceptions.ValidationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.LocalDate;
+import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class FilmControllerTest {
+@Slf4j
+@RestController
+@RequestMapping("/films")
+class FilmController {
+    private final InMemoryFilmStorage filmStorage;
+    private final FilmService filmService;
 
-    public static final String PATH = "/films";
-    @Autowired
-    private MockMvc mockMvc;
-    private FilmController f;
-
-    @BeforeEach
-    void setUp() {
-        f = new FilmController();
+    public FilmController(InMemoryFilmStorage filmStorage, FilmService filmService) {
+        this.filmStorage = filmStorage;
+        this.filmService = filmService;
     }
 
-    @Test
-    void validationOk() {
-        Film film = Film.builder()
-                .name("Harry Potter")
-                .description("Best film")
-                .releaseDate(LocalDate.of(2020, 3, 12))
-                .duration(120)
-                .build();
-        f.createFilm(film);
-        Assertions.assertFalse(f.getFilms().isEmpty());
+    @PostMapping
+    public Film postRequestFilm(@Valid @RequestBody Film film) {
+        filmStorage.create(film);
+        log.debug("The movie is added{}: ", film.getName());
+        return film;
     }
 
-    @Test
-    void throwsExceptionDuringValidationIfNameIsBlank() {
-        Film film = Film.builder()
-                .name("")
-                .description("Best film")
-                .releaseDate(LocalDate.of(2020, 3, 12))
-                .duration(120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
+    @GetMapping()
+    public List<Film> getRequestAllFilm() {
+        List<Film> allFilm = new ArrayList<>(filmStorage.getFilms().values());
+        log.debug("Amount of movies: {}", allFilm.size());
+        return allFilm;
     }
 
-    @Test
-    void throwsExceptionIfDescriptionLengthIsMoreThan200Chars() {
-        Film film = Film.builder()
-                .name("Chelovek-Pauk")
-                .description("Good film aaaaaaaaaaaaagofgjiodenfjklgoiebnowseofhihboiwehrouvbjklsebdnouifbvqoebroivboi" +
-                        "njksefkbjvjiebrviuqbejkrbvjksbdkjbvukbwerkbuvuiwheuirgvquiehriuohqweefoiqwerouhfqiowernbofqw" +
-                        "qwerfjoqberobvquiewbruifbquiwoebfuibquiewbruiqbeuwivbiuqbwuiebvuiqberwuivbquiwbeuivbquibqiuweb")
-                .releaseDate(LocalDate.of(2020,3,03))
-                .duration(120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
-    }
+    @GetMapping("/{id}")
+    public Optional<Film> getRequestFilm(@PathVariable @Min(1) int id) {
+        Optional<Film> film = Optional.ofNullable(filmStorage.getFilm(id));
 
-    @Test
-    void throwsExceptionIfReleaseDateIsBeforeAllowed() {
-        Film film = Film.builder()
-                .name("Harry Potter")
-                .description("Best film")
-                .releaseDate(LocalDate.of(1800, 3, 12))
-                .duration(120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
-    }
-
-    @Test
-    void throwsExceptionIfDurationIsNegative() {
-        Film film = Film.builder()
-                .name("Harry Potter")
-                .description("Best film")
-                .releaseDate(LocalDate.of(1999, 3, 12))
-                .duration(-120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
-    }
-
-    @Test
-    void createNewFilm() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post(PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(readStringFromFile("controller/request/film.json")))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(
-                        readStringFromFile("controller/response/film.json")
-                ));
-    }
-
-    private String readStringFromFile(String filename) {
-        try {
-            return Files.readString(ResourceUtils.getFile("classpath:" + filename).toPath(),
-                    StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            return "";
+        if (film.isEmpty()) {
+            throw new ValidationException("The film doesn't exist.");
         }
+        log.debug("The movie is found {}", film.get().getName());
+        return film;
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getRequestTopFilm(@RequestParam(value = "count", defaultValue = "10") int count) {
+        log.debug("Show top films.");
+        return filmService.getTenMostPopularFilm(count);
+    }
+
+    @PutMapping
+    public Film putRequestFilm(@Valid @RequestBody Film film) {
+        filmStorage.update(film);
+        log.debug("The movie is changed: {} ", film.getName());
+        return film;
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void putRequestAddLike(@PathVariable @Min(1) int id, @PathVariable int userId) {
+        filmService.addLike(userId, id);
+        log.debug("User {} added a like to the movie {}: ", userId, filmStorage.getFilm(id).getName());
+    }
+
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteRequestDeleteLike(@PathVariable @Min(1) int id, @PathVariable int userId) {
+        filmService.removeLike(userId, id);
+        log.debug("User {} delete a like to the movie {}: ", userId, filmStorage.getFilm(id).getName());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ValidationException handleNullableCount(final ValidationException e) {
+        return new ValidationException("Error with the count parameter.");
     }
 }

@@ -12,8 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.ResourceUtils;
-import ru.yandex.practicum.filmorate.controller.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +27,10 @@ import java.time.LocalDate;
 @ActiveProfiles("test")
 class UserControllerTest {
     private UserController u;
+    @Autowired
+    private InMemoryUserStorage userStorage;
+    @Autowired
+    private UserService userService;
     @Autowired
     private MockMvc mockMvc;
     public static final String PATH = "/users";
@@ -42,8 +48,8 @@ class UserControllerTest {
                 .name("vasya testov")
                 .birthday(LocalDate.of(2000, 5, 6))
                 .build();
-        u.addUser(user);
-        Assertions.assertFalse(u.getUsers().isEmpty());
+        userStorage.create(user);
+        Assertions.assertFalse(userStorage.getUsers().isEmpty());
     }
 
     @Test
@@ -54,7 +60,7 @@ class UserControllerTest {
                 .name("vasya testov")
                 .birthday(LocalDate.of(2000, 5, 6))
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
+        Assertions.assertThrows(ValidationException.class, () -> userStorage.validate(user));
     }
 
     @Test
@@ -65,7 +71,7 @@ class UserControllerTest {
                 .name("vasya testov")
                 .birthday(LocalDate.of(2000, 5, 6))
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
+        Assertions.assertThrows(ValidationException.class, () -> userStorage.validate(user));
     }
 
     @Test
@@ -76,7 +82,7 @@ class UserControllerTest {
                 .name("vasya testov")
                 .birthday(LocalDate.of(2000, 5, 6))
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
+        Assertions.assertThrows(ValidationException.class, () -> userStorage.validate(user));
     }
 
     @Test
@@ -87,7 +93,7 @@ class UserControllerTest {
                 .name("vasya testov")
                 .birthday(LocalDate.of(2000, 5, 6))
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
+        Assertions.assertThrows(ValidationException.class, () -> userStorage.validate(user));
     }
 
     @Test
@@ -98,7 +104,7 @@ class UserControllerTest {
                 .name("vasya testov")
                 .birthday(LocalDate.of(2030, 5, 6))
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> u.validate(user));
+        Assertions.assertThrows(ValidationException.class, () -> userStorage.validate(user));
     }
 
     @Test
