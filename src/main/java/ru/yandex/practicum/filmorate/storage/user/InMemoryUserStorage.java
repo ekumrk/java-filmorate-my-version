@@ -18,6 +18,7 @@ public class InMemoryUserStorage extends EntityStorage<User> implements UserStor
     public InMemoryUserStorage() {
         this.storage = new HashMap<>();
     }
+
     @Override
     public void validate(User user) throws NullPointerException {
         if (user.getEmail().isBlank() || user.getEmail().isEmpty()) {

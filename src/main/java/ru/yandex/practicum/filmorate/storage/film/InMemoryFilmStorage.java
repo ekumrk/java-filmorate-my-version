@@ -17,6 +17,7 @@ public class InMemoryFilmStorage extends EntityStorage<Film> implements FilmStor
     public InMemoryFilmStorage() {
         this.storage = new HashMap<>();
     }
+
     public void validate(Film film) throws NullPointerException {
         if (film.getName().isBlank()) {
             throw new ValidationException("Название фильма не может быть пустым.");
