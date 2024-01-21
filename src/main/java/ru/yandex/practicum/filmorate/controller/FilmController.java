@@ -78,9 +78,9 @@ public class FilmController {
 
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteRequestDeleteLike(@PathVariable @Min(1) int id, @PathVariable int userId) {
+    public void deleteRequestDeleteLike(@PathVariable @Min(1) int id, @PathVariable @Min(1) int userId) throws ValidationException {
         if (userId < 0) {
-            throw new DataNotFoundException("Некорректный ID пользователя;");
+            throw new ValidationException("Некорректный ID пользователя;");
         }
         filmService.removeLike(userId, id);
         log.debug("Пользователь {} удалил лайк к фильму {}: ", userId, filmStorage.getFilm(id).getName());

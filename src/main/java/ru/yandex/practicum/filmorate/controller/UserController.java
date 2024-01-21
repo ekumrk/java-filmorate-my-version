@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getRequestOfMutualFriends(@PathVariable @Min(1) int id, @PathVariable int otherId) {
+    public List<User> getRequestOfMutualFriends(@PathVariable @Min(1) int id, @PathVariable @Min(1) int otherId) {
         log.debug("Show all mutual friends.");
         return userService.listOfMutualFriends(id, otherId);
     }
@@ -75,7 +75,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void putRequestAddFriend(@PathVariable @Min(1) int id, @PathVariable int friendId) {
+    public void putRequestAddFriend(@PathVariable @Min(1) int id, @PathVariable int friendId) throws ValidationException {
+        if (friendId < 0) {
+            throw new ValidationException("Некорректный номер друга");
+        }
         userService.addFriend(id, friendId);
         log.debug("User {} added to friend {}", userStorage.getUser(id).getName(),
                 userStorage.getUser(friendId).getName());
