@@ -36,6 +36,7 @@ public class Film extends ModelEntity {
             throw new ValidationException("Вы уже лайкали этот фильм");
         }
     }
+
     @SneakyThrows
     public void removeLike(int idUser) {
         if (usersWhoLikeIt.contains(idUser)) {
