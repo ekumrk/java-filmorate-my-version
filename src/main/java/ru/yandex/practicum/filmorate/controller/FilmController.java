@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import javax.validation.Valid;
@@ -68,6 +70,9 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void putRequestAddLike(@PathVariable @Min(1) int id, @PathVariable int userId) {
+        if (userId < 0) {
+            throw new DataNotFoundException("Некорректный ID пользователя;");
+        }
         filmService.addLike(userId, id);
         log.debug("User {} added a like to the movie {}: ", userId, filmStorage.getFilm(id).getName());
     }
@@ -75,8 +80,11 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteRequestDeleteLike(@PathVariable @Min(1) int id, @PathVariable int userId) {
+        if (userId < 0) {
+            throw new DataNotFoundException("Некорректный ID пользователя;");
+        }
         filmService.removeLike(userId, id);
-        log.debug("User {} delete a like to the movie {}: ", userId, filmStorage.getFilm(id).getName());
+        log.debug("Пользователь {} удалил лайк к фильму {}: ", userId, filmStorage.getFilm(id).getName());
     }
 
     @ExceptionHandler

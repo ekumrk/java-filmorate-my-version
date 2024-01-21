@@ -20,6 +20,14 @@ public class InMemoryUserStorage extends EntityStorage<User> implements UserStor
     }
 
     @Override
+    public User create(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        return super.create(user);
+    }
+
+    @Override
     public void validate(User user) throws NullPointerException {
         if (user.getEmail().isBlank() || user.getEmail().isEmpty()) {
             throw new ValidationException("E-mail адрес не может быть пустым.");
