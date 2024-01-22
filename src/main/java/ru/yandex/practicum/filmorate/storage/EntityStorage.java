@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.storage.exceptions.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.ModelEntity;
 
 import javax.validation.constraints.PositiveOrZero;
