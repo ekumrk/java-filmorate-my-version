@@ -12,8 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.ResourceUtils;
-import ru.yandex.practicum.filmorate.controller.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,9 +32,15 @@ class FilmControllerTest {
     private MockMvc mockMvc;
     private FilmController f;
 
+    @Autowired
+    private InMemoryFilmStorage filmStorage;
+    @Autowired
+    private FilmService filmService;
+
+
     @BeforeEach
     void setUp() {
-        f = new FilmController();
+        f = new FilmController(filmStorage, filmService);
     }
 
     @Test
@@ -43,8 +51,8 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(2020, 3, 12))
                 .duration(120)
                 .build();
-        f.createFilm(film);
-        Assertions.assertFalse(f.getFilms().isEmpty());
+        filmStorage.create(film);
+        Assertions.assertFalse(filmStorage.getStorage().isEmpty());
     }
 
     @Test
@@ -55,7 +63,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(2020, 3, 12))
                 .duration(120)
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
+        Assertions.assertThrows(ValidationException.class, () -> filmStorage.validate(film));
     }
 
     @Test
@@ -68,7 +76,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(2020,3,03))
                 .duration(120)
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
+        Assertions.assertThrows(ValidationException.class, () -> filmStorage.validate(film));
     }
 
     @Test
@@ -79,7 +87,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1800, 3, 12))
                 .duration(120)
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
+        Assertions.assertThrows(ValidationException.class, () -> filmStorage.validate(film));
     }
 
     @Test
@@ -90,14 +98,14 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1999, 3, 12))
                 .duration(-120)
                 .build();
-        Assertions.assertThrows(ValidationException.class, () -> f.validate(film));
+        Assertions.assertThrows(ValidationException.class, () -> filmStorage.validate(film));
     }
 
     @Test
     void createNewFilm() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(readStringFromFile("controller/request/film.json")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(readStringFromFile("controller/request/film.json")))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(
                         readStringFromFile("controller/response/film.json")
