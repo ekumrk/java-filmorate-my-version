@@ -1,45 +1,46 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+@Builder(toBuilder = true)
 @Data
-@SuperBuilder
-@NoArgsConstructor(force = true)
-@EqualsAndHashCode(callSuper = true)
-public class User extends ModelEntity {
+@AllArgsConstructor
+public class User {
+
+    @PositiveOrZero(message = "ID не может быть отрицательным числом")
+    private int id;
+
     @NotBlank
     @NotNull
-    private final String login;
+    private String login;
 
     private String name;
 
     @NotBlank
     @NotNull
     @Email
-    private final String email;
+    private String email;
 
     @PastOrPresent
-    private final LocalDate birthday;
-    @JsonIgnore
-    private Set<Integer> idFriends = new HashSet<>();
+    @NotNull
+    private LocalDate birthday;
 
-    public void addFriend(int idUser) {
-        idFriends.add(idUser);
+    @JsonIgnore
+    private final Set<Integer> friendIds = new HashSet<>();
+
+    public void addFriend(Integer id) {
+        friendIds.add(id);
     }
 
-    public void removeFriend(int idUser) {
-        idFriends.remove(idUser);
+    public void deleteFriend(Integer id) {
+        friendIds.remove(id);
     }
 }

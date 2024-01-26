@@ -1,47 +1,56 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import org.hibernate.validator.constraints.Length;
+import ru.yandex.practicum.filmorate.model.supportive.Genre;
+import ru.yandex.practicum.filmorate.model.supportive.MPA;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class Film extends ModelEntity {
+@Builder(toBuilder = true)
+@Getter
+@Setter
+@AllArgsConstructor
+public class Film {
+    @PositiveOrZero(message = "ID не может быть отрицательным числом")
+    private int id;
+
+    @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
+
+    @NotBlank
+    @Length(max = 200, message = "Описание не может превышать 200 символов")
     private String description;
+
+    @NotNull
     private LocalDate releaseDate;
+
+    @NotNull(message = "Длительность фильма не может быть пустой")
+    @Positive(message = "Длительность фильма не может быть отрицательной или нулем")
     private int duration;
+
+    private Set<Genre> genres;
+
+    private MPA mpa;
+
     @JsonIgnore
-    private Set<Integer> usersWhoLikeIt = new HashSet<>();
+    private final Set<Integer> likes;
 
-    @Setter(AccessLevel.NONE)
-    private int likes = 0;
-
-    @SneakyThrows
-    public void addLike(int idUser) {
-        try {
-            usersWhoLikeIt.add(idUser);
-            likes++;
-        } catch (Exception e) {
-            throw new ValidationException("Вы уже лайкали этот фильм");
-        }
+    public void addLike(Integer id) {
+        likes.add(id);
     }
 
-    @SneakyThrows
-    public void removeLike(int idUser) {
-        if (usersWhoLikeIt.contains(idUser)) {
-            usersWhoLikeIt.remove(idUser);
-            likes--;
-        }
+    public void deleteLike(Integer id) {
+        likes.remove(id);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
 }

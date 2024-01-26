@@ -30,21 +30,21 @@ public class UserController {
     }
 
     @PostMapping
-    public User postRequestUser(@Valid @RequestBody User user) {
-        userService.userStorage.create(user);
+    public User addUser(@Valid @RequestBody User user) {
+        userService.create(user);
         return user;
     }
 
     @GetMapping()
-    public List<User> getRequestAllUser() {
-        List<User> allUsers = new ArrayList<>(userService.userStorage.getUsers().values());
+    public List<User> getUsers() {
+        List<User> allUsers = new ArrayList<>(userService.getAll());
         log.debug("Amount of movies: {}", allUsers.size());
         return allUsers;
     }
 
     @GetMapping("/{id}")
     public Optional<User> getRequestUser(@Validated @PathVariable @Min(1) int id) {
-        Optional<User> user = Optional.ofNullable(userService.userStorage.getUser(id));
+        Optional<User> user = Optional.ofNullable(userService.getById(id));
 
         if (user.isEmpty()) {
             throw new ValidationException("Такого пользователя не существует");
@@ -57,18 +57,18 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public List<User> getRequestAllUserFriends(@Validated @PathVariable @Min(1) int id) {
         log.debug("Show all friends.");
-        return userService.listAllFriends(id);
+        return userService.getAllFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getRequestOfMutualFriends(@Validated @PathVariable @Min(1) int id, @PathVariable @Min(1) int otherId) {
         log.debug("Show all mutual friends.");
-        return userService.listOfMutualFriends(id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 
     @PutMapping
     public User putRequestUser(@Valid @RequestBody User user) {
-        userService.userStorage.update(user);
+        userService.update(user);
         return user;
     }
 
@@ -78,15 +78,20 @@ public class UserController {
             throw new ValidationException("Некорректный номер друга");
         }
         userService.addFriend(id, friendId);
-        log.debug("User {} added to friend {}", userService.userStorage.getUser(id).getName(),
-                userService.userStorage.getUser(friendId).getName());
+        log.debug("User {} added to friend {}", userService.getById(id).getName(),
+                userService.getById(friendId).getName());
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteRequestDeleteFriend(@Validated @PathVariable @Min(1) int id, @PathVariable int friendId) {
         userService.removeFriend(id, friendId);
-        log.debug("User {} delete to friend {}", userService.userStorage.getUser(id).getName(),
-                userService.userStorage.getUser(friendId).getName());
+        log.debug("User {} delete to friend {}", userService.getById(id).getName(),
+                userService.getById(friendId).getName());
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUserById(@PathVariable Integer id) {
+        userService.delete(id);
     }
 
     @ExceptionHandler
