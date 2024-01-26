@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 public class MPA extends ModelEntity {
 
     String name;
-     public MPA (int id, String name) {
+
+     public MPA(int id, String name) {
          super(id);
          this.name = name;
      }
