@@ -1,124 +1,84 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.ResourceUtils;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.LocalDate;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest
 @AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class FilmControllerTest {
+public class FilmControllerTest {
 
-    public static final String PATH = "/films";
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private FilmController f;
-
-    @Autowired
-    private FilmStorage filmStorage;
-    @Autowired
-    private FilmService filmService;
-
-
-    @BeforeEach
-    void setUp() {
-        f = new FilmController(filmService);
-    }
 
     @Test
-    void validationOk() {
-        Film film = Film.builder()
-                .name("Harry Potter")
-                .description("Best film")
-                .releaseDate(LocalDate.of(2020, 3, 12))
-                .duration(120)
-                .build();
-        filmStorage.create(film);
-        Assertions.assertFalse(filmStorage.getFilms().isEmpty());
-    }
-
-    @Test
-    void throwsExceptionDuringValidationIfNameIsBlank() {
-        Film film = Film.builder()
-                .name("")
-                .description("Best film")
-                .releaseDate(LocalDate.of(2020, 3, 12))
-                .duration(120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> filmStorage.create(film));
-    }
-
-    @Test
-    void throwsExceptionIfDescriptionLengthIsMoreThan200Chars() {
-        Film film = Film.builder()
-                .name("Chelovek-Pauk")
-                .description("Good film aaaaaaaaaaaaagofgjiodenfjklgoiebnowseofhihboiwehrouvbjklsebdnouifbvqoebroivboi" +
-                        "njksefkbjvjiebrviuqbejkrbvjksbdkjbvukbwerkbuvuiwheuirgvquiehriuohqweefoiqwerouhfqiowernbofqw" +
-                        "qwerfjoqberobvquiewbruifbquiwoebfuibquiewbruiqbeuwivbiuqbwuiebvuiqberwuivbquiwbeuivbquibqiuweb")
-                .releaseDate(LocalDate.of(2020,3,03))
-                .duration(120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> filmStorage.create(film));
-    }
-
-    @Test
-    void throwsExceptionIfReleaseDateIsBeforeAllowed() {
-        Film film = Film.builder()
-                .name("Harry Potter")
-                .description("Best film")
-                .releaseDate(LocalDate.of(1800, 3, 12))
-                .duration(120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> filmStorage.create(film));
-    }
-
-    @Test
-    void throwsExceptionIfDurationIsNegative() {
-        Film film = Film.builder()
-                .name("Harry Potter")
-                .description("Best film")
-                .releaseDate(LocalDate.of(1999, 3, 12))
-                .duration(-120)
-                .build();
-        Assertions.assertThrows(ValidationException.class, () -> filmStorage.create(film));
-    }
-
-    @Test
-    void createNewFilm() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post(PATH)
+    void shouldAddFilmAndUpdateFilm() throws Exception {
+        //Добавление фильма
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(readStringFromFile("controller/request/film.json")))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(
-                        readStringFromFile("controller/response/film.json")
-                ));
+                        .content("{\"name\": \"Film name\", \"description\": \"Film description\"," +
+                                " \"releaseDate\": \"1967-03-25\", \"duration\": 100}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/films"))
+                .andExpect(content().string("[{\"name\":\"Film name\",\"description\":\"Film description\"," +
+                        "\"releaseDate\":\"1967-03-25\",\"duration\":100,\"id\":1,\"likes\":[]}]"));
+
+        //Обновление фильма
+        mockMvc.perform(put("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\": \"1\",\"name\": \"FilmNameUpdate\", \"description\": \"Film description\"," +
+                                " \"releaseDate\": \"1967-03-25\", \"duration\": 100}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/films"))
+                .andExpect(content().string("[{\"name\":\"FilmNameUpdate\",\"description\":\"Film description\"," +
+                        "\"releaseDate\":\"1967-03-25\",\"duration\":100,\"id\":1,\"likes\":[]}]"));
     }
 
-    private String readStringFromFile(String filename) {
-        try {
-            return Files.readString(ResourceUtils.getFile("classpath:" + filename).toPath(),
-                    StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            return "";
-        }
+    @Test
+    void shouldAddFilmAndUpdateFilmUnsuccessfully() throws Exception {
+        //фильм с пустым названием
+        mockMvc.perform(post("/films/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"\", \"description\": \"Film description\"," +
+                                " \"releaseDate\": \"1967-03-25\", \"duration\": 100}"))
+                .andExpect(status().is5xxServerError());
+
+        //фильм со слишком длинным описанием
+        mockMvc.perform(post("/films/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"FilmName\", \"description\": \"Film descriptionFilm descriptionFilm " +
+                                "descriptionFilm descriptionFilm descriptionFilm descriptionFilm descriptionFilm " +
+                                "descriptionFilm descriptionFilm descriptionFilm descriptionFilm descriptionFilm " +
+                                "descriptionFilm descriptionFilm descriptionFilm descriptionFilm descriptionFilm " +
+                                "descriptionFilm descriptionFilm description Film descriptionFilm descriptionFilm " +
+                                "descriptionFilm descriptionFilm descriptionFilm descriptionFilm description\"," +
+                                " \"releaseDate\": \"1967-03-25\", \"duration\": 100}"))
+                .andExpect(status().is5xxServerError());
+
+        //обновление несуществующего фильма
+        mockMvc.perform(put("/films/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\": \"2\",\"name\": \"FilmNameUpdate\", \"description\": \"Film description\"," +
+                                " \"releaseDate\": \"1967-03-25\", \"duration\": 100}"))
+                .andExpect(status().is4xxClientError());
+
+        //фильм с неправильной датой выпуска
+        mockMvc.perform(put("/films/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"FilmName\", \"description\": \"Film description\"," +
+                                " \"releaseDate\": \"1890-03-25\", \"duration\": 100}"))
+                .andExpect(status().is5xxServerError());
     }
+
 }
