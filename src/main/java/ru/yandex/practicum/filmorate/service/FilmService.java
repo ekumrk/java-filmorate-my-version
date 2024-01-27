@@ -88,19 +88,15 @@ public class FilmService {
 
     public Set<Film> getTopFilm(int count) {
         Set<Film> filmsSet = new TreeSet<>((o1, o2) -> {
-            if (o1.getLikes().size() > o2.getLikes().size()) {
-                return 1;
-            } else if (o1.getLikes().size() == o2.getLikes().size()) {
-                return 0;
-            }
-            return -1;
+            return o2.getLikes().size() > o1.getLikes().size() ? 1 : -1;
         });
 
-        for (Film f : filmStorage.getFilms()) {
+        /*for (Film f : filmStorage.getFilms()) {
             if (!f.getLikes().isEmpty()) {
                 filmsSet.add(f);
             }
-        }
+        } */
+        filmsSet.addAll(filmStorage.getFilms());
 
         Set<Film> films = filmsSet.stream()
                 .limit(count)
