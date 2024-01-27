@@ -61,6 +61,7 @@ public class FilmService {
         if (film != null) {
             if (userStorage.getUser(userId) != null) {
                 filmStorage.addLike(filmId, userId);
+                film.addLike(userId);
                 log.info("Like successfully added");
             } else {
                 throw new DataNotFoundException("Пользователь с id = " + userId + " не найден");
@@ -75,6 +76,7 @@ public class FilmService {
         if (film != null) {
             if (userStorage.getUser(userId) != null) {
                 filmStorage.removeLike(filmId, userId);
+                film.deleteLike(userId);
                 log.info("Like successfully removed");
             } else {
                 throw new DataNotFoundException("Пользователь с id = " + userId + " не найден");

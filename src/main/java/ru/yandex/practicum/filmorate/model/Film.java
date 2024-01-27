@@ -45,11 +45,11 @@ public class Film {
     @JsonIgnore
     private final Set<Integer> likes = new HashSet<>();
 
-    public void addLike(Integer id) {
+    public void addLike(int id) {
         likes.add(id);
     }
 
-    public void deleteLike(Integer id) {
+    public void deleteLike(int id) {
         likes.remove(id);
     }
 
