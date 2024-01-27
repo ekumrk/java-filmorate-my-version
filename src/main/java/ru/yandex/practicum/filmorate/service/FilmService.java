@@ -31,10 +31,7 @@ public class FilmService {
         return filmStorage.getFilms();
     }
 
-    public Film create(Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1985, 12, 28))) {
-            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1985 года.");
-        }
+    public Film create(Film film) {
         Film result = filmStorage.create(film);
         log.info("Фильм успешно добавлен: " + film);
         return result;

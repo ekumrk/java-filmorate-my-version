@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.model.supportive.Genre;
 import ru.yandex.practicum.filmorate.model.supportive.MPA;
+import ru.yandex.practicum.filmorate.model.validation.AfterDate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class Film {
     private String description;
 
     @NotNull
+    @AfterDate
     private LocalDate releaseDate;
 
     @NotNull(message = "Длительность фильма не может быть пустой")
