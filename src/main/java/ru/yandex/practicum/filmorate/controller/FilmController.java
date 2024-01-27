@@ -7,7 +7,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -15,7 +14,6 @@ import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -54,7 +52,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Set<Film> findPopular(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> findPopular(@RequestParam(defaultValue = "10") int count) {
         int filmCount = count;
         log.debug("Показаны лучшие фильмы.");
         return filmService.getTopFilm(filmCount);
@@ -68,9 +66,9 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLikeToFilm(@PathVariable int id, @PathVariable int userId) {
+    public void addLikeToFilm(@PathVariable int id, @PathVariable int userId) throws ValidationException {
         if (userId < 0) {
-            throw new DataNotFoundException("Некорректный ID пользователя;");
+            throw new ValidationException("Некорректный ID пользователя;");
         }
         filmService.addLike(id, userId);
         log.debug("Пользователь с id = {} поставил лайк фильму {}: ", userId, filmService.getById(id).getName());
