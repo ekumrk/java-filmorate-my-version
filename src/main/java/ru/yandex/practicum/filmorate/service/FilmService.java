@@ -11,6 +11,9 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -82,8 +85,14 @@ public class FilmService {
         }
     }
 
-    public List<Film> getTopFilm(int volume) {
-        log.info("Запрошен список самых популярных фильмов");
-        return new ArrayList<>(filmStorage.getTopFilm(volume));
+    public List<Film> getTopFilm(int count) {
+        Set<Film> filmsSet = new TreeSet<>((film1, film2) ->
+        film1.getLikes().size() - film2.getLikes().size());
+        filmsSet.addAll(filmStorage.getFilms());
+
+        List<Film> films = filmsSet.stream()
+                .limit(count)
+                .collect(Collectors.toList());
+        return films;
     }
 }
