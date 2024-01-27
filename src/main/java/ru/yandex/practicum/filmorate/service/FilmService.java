@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -86,14 +87,20 @@ public class FilmService {
         }
     }
 
-    public List<Film> getTopFilm(int count) {
-        Set<Film> filmsSet = new TreeSet<>((film1, film2) ->
-        film1.getLikes().size() - film2.getLikes().size());
+    public Set<Film> getTopFilm(int count) {
+        Set<Film> filmsSet = new TreeSet<>((o1, o2) -> {
+            if (o1.getLikes().size() > o2.getLikes().size()) {
+                return 1;
+            } else if (o1.getLikes().size() == o2.getLikes().size()) {
+                return 0;
+            }
+            return -1;
+        });
         filmsSet.addAll(filmStorage.getFilms());
 
-        List<Film> films = filmsSet.stream()
+        Set<Film> films = filmsSet.stream()
                 .limit(count)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         return films;
     }
 }
