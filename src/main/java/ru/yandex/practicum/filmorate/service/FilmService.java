@@ -89,11 +89,11 @@ public class FilmService {
     public Set<Film> getTopFilm(int count) {
         Set<Film> filmsSet = new TreeSet<>((o1, o2) -> {
             if (o1.getLikes().size() > o2.getLikes().size()) {
-                return 1;
+                return -1;
             } else if (o1.getLikes().size() == o2.getLikes().size()) {
                 return 0;
             }
-            return -1;
+            return 1;
         });
         filmsSet.addAll(filmStorage.getFilms());
 
