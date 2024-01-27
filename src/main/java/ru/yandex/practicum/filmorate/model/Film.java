@@ -43,7 +43,7 @@ public class Film {
     private MPA mpa;
 
     @JsonIgnore
-    private final Set<Integer> likes = new HashSet<>();
+    private final Set<Integer> likes;
 
     public void addLike(Integer id) {
         likes.add(id);

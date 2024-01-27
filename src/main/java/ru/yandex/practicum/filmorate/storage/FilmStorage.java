@@ -20,7 +20,7 @@ public interface FilmStorage {
 
     void addGenre(int filmId, Set<Genre> genres);
 
-    void addLike(int filmId, int userId);
+    void addLike(int userId, int filmId);
 
     void removeLike(int filmId, int userId);
 

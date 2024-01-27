@@ -130,10 +130,10 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sglQuery, filmId);
     }
 
-    public void addLike(int filmId, int userId) {
-        String sqlQuery = "INSERT INTO likes (FILM_ID, user_id) "
+    public void addLike(int userId, int filmId) {
+        String sqlQuery = "INSERT INTO likes (user_id, film_id) "
                 + "VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
+        jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 
     public void removeLike(int filmId, int userId) {

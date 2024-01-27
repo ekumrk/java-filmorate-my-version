@@ -70,7 +70,7 @@ public class FilmController {
         if (userId < 0) {
             throw new DataNotFoundException("Некорректный ID пользователя;");
         }
-        filmService.addLike(userId, id);
+        filmService.addLike(id, userId);
         log.debug("Пользователь с id = {} поставил лайк фильму {}: ", userId, filmService.getById(id).getName());
     }
 
