@@ -10,6 +10,9 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -83,8 +86,8 @@ public class FilmService {
         }
     }
 
-    public List<Film> getTopFilm(int count) {
-        /*Set<Film> filmsSet = new TreeSet<>((o1, o2) -> {
+    public Set<Film> getTopFilm(int count) {
+        Set<Film> filmsSet = new TreeSet<>((o1, o2) -> {
             if (o1.getLikes().size() > o2.getLikes().size()) {
                 return 1;
             } else if (o1.getLikes().size() == o2.getLikes().size()) {
@@ -92,11 +95,17 @@ public class FilmService {
             }
             return -1;
         });
-        filmsSet.addAll(filmStorage.getFilms());
+
+        for (Film f : filmStorage.getFilms()) {
+            if (!f.getLikes().isEmpty()) {
+                filmsSet.add(f);
+            }
+        }
 
         Set<Film> films = filmsSet.stream()
                 .limit(count)
-                .collect(Collectors.toSet()); Этот вариант тоже не сработал */
-        return filmStorage.getTopFilm(count);
+                .collect(Collectors.toSet());
+        return films;
+        //return filmStorage.getTopFilm(count);
     }
 }

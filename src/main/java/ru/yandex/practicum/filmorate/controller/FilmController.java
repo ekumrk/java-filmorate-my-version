@@ -14,6 +14,7 @@ import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -52,7 +53,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> findPopular(@RequestParam(defaultValue = "10") int count) {
+    public Set<Film> findPopular(@RequestParam(defaultValue = "10") int count) {
         int filmCount = count;
         log.debug("Показаны лучшие фильмы.");
         return filmService.getTopFilm(filmCount);
