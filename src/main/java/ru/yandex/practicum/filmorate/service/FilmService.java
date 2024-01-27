@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,9 @@ public class FilmService {
     }
 
     public Film create(Film film) {
+        if(film.getReleaseDate().isBefore(LocalDate.of(1985, 12, 28))) {
+            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1985 года.");
+        }
         Film result = filmStorage.create(film);
         log.info("Фильм успешно добавлен: " + film);
         return result;
