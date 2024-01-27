@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Builder(toBuilder = true)
