@@ -67,7 +67,7 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLikeToFilm(@Validated @PathVariable @Min(1) int id, @PathVariable int userId) {
+    public void addLikeToFilm(@PathVariable int id, @PathVariable int userId) {
         if (userId < 0) {
             throw new DataNotFoundException("Некорректный ID пользователя;");
         }
@@ -77,7 +77,7 @@ public class FilmController {
 
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLikeToFilm(@Validated @PathVariable @Min(1) int id, @PathVariable @Min(1) int userId) throws ValidationException {
+    public void deleteLikeToFilm(@PathVariable int id, @PathVariable int userId) throws ValidationException {
         if (userId < 0) {
             throw new ValidationException("Некорректный ID пользователя;");
         }
