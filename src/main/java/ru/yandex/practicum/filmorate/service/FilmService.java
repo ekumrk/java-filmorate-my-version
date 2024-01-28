@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
@@ -20,10 +20,13 @@ public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
-    @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("UserDbStorage") UserStorage userStorage) {
+    private final LikesStorage likesStorage;
+
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("UserDbStorage") UserStorage
+            userStorage, @Qualifier("LikesDbStorage") LikesStorage likesStorage) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
+        this.likesStorage = likesStorage;
     }
 
     public List<Film> getAll() {
@@ -60,7 +63,7 @@ public class FilmService {
         Film film = filmStorage.getFilm(filmId);
         if (film != null) {
             if (userStorage.getUser(userId) != null) {
-                filmStorage.addLike(filmId, userId);
+                likesStorage.addLike(filmId, userId);
                 film.addLike(userId);
                 log.info("Like successfully added");
             } else {
@@ -75,7 +78,7 @@ public class FilmService {
         Film film = filmStorage.getFilm(filmId);
         if (film != null) {
             if (userStorage.getUser(userId) != null) {
-                filmStorage.removeLike(filmId, userId);
+                likesStorage.removeLike(filmId, userId);
                 film.deleteLike(userId);
                 log.info("Like successfully removed");
             } else {
@@ -91,17 +94,11 @@ public class FilmService {
             return o2.getLikes().size() > o1.getLikes().size() ? 1 : -1;
         });
 
-        /*for (Film f : filmStorage.getFilms()) {
-            if (!f.getLikes().isEmpty()) {
-                filmsSet.add(f);
-            }
-        } */
         filmsSet.addAll(filmStorage.getFilms());
 
         Set<Film> films = filmsSet.stream()
                 .limit(count)
                 .collect(Collectors.toSet());
         return films;
-        //return filmStorage.getTopFilm(count);
     }
 }

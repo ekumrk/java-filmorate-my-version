@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.supportive.Genre;
 import ru.yandex.practicum.filmorate.model.supportive.MPA;
+import ru.yandex.practicum.filmorate.storage.LikesStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -128,29 +129,6 @@ public class FilmDbStorage implements FilmStorage {
     private void deleteAllGenresById(int filmId) {
         String sglQuery = "DELETE FROM FILM_GENRES WHERE FILM_ID = ?";
         jdbcTemplate.update(sglQuery, filmId);
-    }
-
-    public void addLike(int userId, int filmId) {
-        String sqlQuery = "INSERT INTO likes (user_id, film_id) "
-                + "VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery, userId, filmId);
-    }
-
-    public void removeLike(int filmId, int userId) {
-        String sqlQuery = "DELETE likes "
-                + "WHERE FILM_ID = ? AND user_id = ?";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
-    }
-
-    public List<Film> getTopFilm(Integer count) {
-        String sqlQuery = "SELECT * FROM FILMS "
-                + "LEFT JOIN likes ON likes.FILM_ID = FILMS.FILM_ID "
-                + "JOIN MPA_RATING ON FILMS.MPA_RATING_ID = MPA_RATING.RATING_ID "
-                + "GROUP BY FILMS.FILM_ID "
-                + "ORDER BY COUNT(likes.FILM_ID) DESC"
-                + "LIMIT "
-                + count;
-        return jdbcTemplate.query(sqlQuery, this::makeFilm);
     }
 
     private List<Film> addGenre(List<Film> films) {
