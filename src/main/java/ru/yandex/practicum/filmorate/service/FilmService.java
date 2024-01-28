@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
@@ -22,8 +23,9 @@ public class FilmService {
 
     private final LikesStorage likesStorage;
 
+    @Autowired
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("UserDbStorage") UserStorage
-            userStorage, LikesStorage likesStorage) {
+            userStorage, @Qualifier("LikesDbStorage") LikesStorage likesStorage) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
         this.likesStorage = likesStorage;
@@ -64,7 +66,6 @@ public class FilmService {
         if (film != null) {
             if (userStorage.getUser(userId) != null) {
                 likesStorage.addLike(filmId, userId);
-                film.addLike(userId);
                 log.info("Like successfully added");
             } else {
                 throw new DataNotFoundException("Пользователь с id = " + userId + " не найден");
@@ -79,7 +80,6 @@ public class FilmService {
         if (film != null) {
             if (userStorage.getUser(userId) != null) {
                 likesStorage.removeLike(filmId, userId);
-                film.deleteLike(userId);
                 log.info("Like successfully removed");
             } else {
                 throw new DataNotFoundException("Пользователь с id = " + userId + " не найден");
@@ -89,16 +89,7 @@ public class FilmService {
         }
     }
 
-    public Set<Film> getTopFilm(int count) {
-        Set<Film> filmsSet = new TreeSet<>((o1, o2) -> {
-            return o2.getLikes().size() > o1.getLikes().size() ? 1 : -1;
-        });
-
-        filmsSet.addAll(filmStorage.getFilms());
-
-        Set<Film> films = filmsSet.stream()
-                .limit(count)
-                .collect(Collectors.toSet());
-        return films;
+    public List<Film> getTopFilm(int count) {
+        return likesStorage.getTopFilm(count);
     }
 }

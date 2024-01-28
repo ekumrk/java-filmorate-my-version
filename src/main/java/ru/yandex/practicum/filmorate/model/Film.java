@@ -42,17 +42,6 @@ public class Film {
 
     private MPA mpa;
 
-    @JsonIgnore
-    private final Set<Integer> likes = new HashSet<>();
-
-    public void addLike(int id) {
-        likes.add(id);
-    }
-
-    public void deleteLike(int id) {
-        likes.remove(id);
-    }
-
     public void addGenre(Genre genre) {
         genres.add(genre);
     }
