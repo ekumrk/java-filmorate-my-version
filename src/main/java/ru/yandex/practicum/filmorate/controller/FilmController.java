@@ -16,12 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Validated
 @RestController
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
-
 
     @Autowired
     public FilmController(FilmService filmService) {

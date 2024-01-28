@@ -17,7 +17,6 @@ import java.util.List;
 public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
-
     private final LikesStorage likesStorage;
 
     @Autowired
@@ -58,7 +57,7 @@ public class FilmService {
         return filmStorage.getFilm(id);
     }
 
-    public void addLike(int userId, int filmId) {
+    public void addLike(int filmId, int userId) {
         Film film = filmStorage.getFilm(filmId);
         if (film != null) {
             if (userStorage.getUser(userId) != null) {
