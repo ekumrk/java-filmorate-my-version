@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.supportive.Genre;
 import ru.yandex.practicum.filmorate.model.supportive.MPA;
+import ru.yandex.practicum.filmorate.storage.LikesStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
