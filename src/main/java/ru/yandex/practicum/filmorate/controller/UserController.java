@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -61,7 +62,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getRequestOfMutualFriends(@Validated @PathVariable @Min(1) int id, @Validated @PathVariable @Min(1) int otherId) {
+    public List<User> getRequestOfMutualFriends(@Validated @PathVariable @Min(1) int id, @PathVariable @Min(1) int otherId) {
         log.debug("Show all mutual friends.");
         return userService.getCommonFriends(id, otherId);
     }

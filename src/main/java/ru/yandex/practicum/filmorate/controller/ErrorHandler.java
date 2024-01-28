@@ -39,4 +39,11 @@ public class ErrorHandler {
                 "Произошла непредвиденная ошибка."
         );
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleAlreadyExistException(final ValidationException e) {
+        log.info("409 {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 }

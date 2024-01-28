@@ -23,7 +23,7 @@ public class LikesDbStorage implements LikesStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void addLike(int filmId, int userId) {
+    public void addLike(int userId, int filmId) {
         String sqlQuery = "INSERT INTO likes (user_id, film_id) "
                 + "VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
