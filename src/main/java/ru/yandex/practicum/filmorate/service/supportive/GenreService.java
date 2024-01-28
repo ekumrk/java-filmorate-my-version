@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service.supportive;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.supportive.Genre;
@@ -12,7 +11,6 @@ import java.util.List;
 public class GenreService {
     private final GenreDbStorage genreDbStorage;
 
-    @Autowired
     public GenreService(GenreDbStorage genreDbStorage) {
         this.genreDbStorage = genreDbStorage;
     }
