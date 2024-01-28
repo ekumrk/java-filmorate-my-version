@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor

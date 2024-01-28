@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/films")
 public class FilmController {
