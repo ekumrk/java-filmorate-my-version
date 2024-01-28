@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import java.util.Set;
 public class FilmController {
     private final FilmService filmService;
 
-
+    @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }

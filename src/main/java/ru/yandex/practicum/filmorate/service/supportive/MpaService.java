@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.supportive;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.supportive.MPA;
@@ -11,6 +12,7 @@ import java.util.List;
 public class MpaService {
     private final MpaDbStorage mpaDbStorage;
 
+    @Autowired
     public MpaService(MpaDbStorage mpaDbStorage) {
         this.mpaDbStorage = mpaDbStorage;
     }

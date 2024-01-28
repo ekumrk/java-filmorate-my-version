@@ -19,4 +19,10 @@ public interface FilmStorage {
     public String delete(int filmId);
 
     void addGenre(int filmId, Set<Genre> genres);
+
+    void addLike(int userId, int filmId);
+
+    void removeLike(int filmId, int userId);
+
+    List<Film> getTopFilm(Integer count);
 }

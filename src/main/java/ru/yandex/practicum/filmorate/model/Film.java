@@ -34,7 +34,7 @@ public class Film {
     @AfterDate
     private LocalDate releaseDate;
 
-    @NotBlank(message = "Длительность фильма не может быть пустой")
+    @NotNull(message = "Длительность фильма не может быть пустой")
     @Positive(message = "Длительность фильма не может быть отрицательной или нулем")
     private int duration;
 
