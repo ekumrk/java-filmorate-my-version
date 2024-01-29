@@ -1,58 +1,107 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class FilmService {
-    public final InMemoryFilmStorage filmStorage;
-    public final InMemoryUserStorage userStorage;
+    private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage, InMemoryUserStorage userStorage) {
-        this.filmStorage = filmStorage;
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("UserDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
     }
 
-    public void addLike(int idUser, int idFilm) {
-        checkingTheExistenceOfUsersAndFilms(idUser, idFilm);
-
-        filmStorage.getFilm(idFilm).addLike(idUser);
+    public List<Film> getAll() {
+        log.info("Список фильмов: " + filmStorage.getFilms().size());
+        return filmStorage.getFilms();
     }
 
-    public void removeLike(int idUser, int idFilm) {
-        checkingTheExistenceOfUsersAndFilms(idUser, idFilm);
-
-        filmStorage.getFilm(idFilm).removeLike(idUser);
+    public Film create(Film film) {
+        Film result = filmStorage.create(film);
+        log.info("Фильм успешно добавлен: " + film);
+        return result;
     }
 
-    public List<Film> getTenMostPopularFilm(int count) {
-        return filmStorage.getFilms().values().stream()
-                .sorted((f1, f2) -> {
-                    if (f1.getLikes() == f2.getLikes()) {
-                        return 0;
-                    }
-                    return (f1.getLikes() > f2.getLikes()) ? -1 : 1;
-                })
+    public Film update(Film film) {
+        Film result = filmStorage.update(film);
+        log.info("Movie successfully updated: " + film);
+        return result;
+    }
+
+    public void delete(int filmId) {
+        if (getById(filmId) == null) {
+            throw new DataNotFoundException("Фильм с Id = " + filmId + " не найден");
+        }
+        log.info("Удалён фильм с id: {}", filmId);
+        filmStorage.delete(filmId);
+    }
+
+    public Film getById(int id) {
+        log.info("Запрошен фильм с id = " + id);
+        return filmStorage.getFilm(id);
+    }
+
+    public void addLike(int userId, int filmId) {
+        Film film = filmStorage.getFilm(filmId);
+        if (film != null) {
+            if (userStorage.getUser(userId) != null) {
+                filmStorage.addLike(filmId, userId);
+                film.addLike(userId);
+                log.info("Like successfully added");
+            } else {
+                throw new DataNotFoundException("Пользователь с id = " + userId + " не найден");
+            }
+        } else {
+            throw new DataNotFoundException("Фильм с id = " + filmId + " не найден");
+        }
+    }
+
+    public void removeLike(int filmId, int userId) {
+        Film film = filmStorage.getFilm(filmId);
+        if (film != null) {
+            if (userStorage.getUser(userId) != null) {
+                filmStorage.removeLike(filmId, userId);
+                film.deleteLike(userId);
+                log.info("Like successfully removed");
+            } else {
+                throw new DataNotFoundException("Пользователь с id = " + userId + " не найден");
+            }
+        } else {
+            throw new DataNotFoundException("Фильм с id = " + filmId + " не найден");
+        }
+    }
+
+    public Set<Film> getTopFilm(int count) {
+        Set<Film> filmsSet = new TreeSet<>((o1, o2) -> {
+            return o2.getLikes().size() > o1.getLikes().size() ? 1 : -1;
+        });
+
+        /*for (Film f : filmStorage.getFilms()) {
+            if (!f.getLikes().isEmpty()) {
+                filmsSet.add(f);
+            }
+        } */
+        filmsSet.addAll(filmStorage.getFilms());
+
+        Set<Film> films = filmsSet.stream()
                 .limit(count)
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    @SneakyThrows
-    private void checkingTheExistenceOfUsersAndFilms(int idUser, int idFilm) {
-        if (!userStorage.getUsers().containsKey(idUser)) {
-            throw new ValidationException("Пользователь не найден");
-        }
-        if (!filmStorage.getFilms().containsKey(idFilm)) {
-            throw new ValidationException("Такой фильм не существует, проверьте корректность введенного Id");
-        }
+                .collect(Collectors.toSet());
+        return films;
+        //return filmStorage.getTopFilm(count);
     }
 }
